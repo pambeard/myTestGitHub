@@ -6,101 +6,6 @@ HOST: http://polls.apiblueprint.org/
 viaDDSdemo1 is an ViaSat Data Delivery service API allowing consumers to request data collection from various antenna sites around the world.
 
 
-## Task [/task]
-
-Required attributes:
-
-    - 'id'  Automatically assigned {task_id}
-    - 'StartTime'
-    - 'StopTime'
-    - 'type'    Track, Test, Maintenance
-    
-Option attributes:
-    - 'stationId'   
-        
-
-### Create a New Task [POST]
-
-You may create a new task using this action. It takes a JSON
-object containing a information about the task. 
-
-+ Request (application/json)
-
-        {
-            "start time": 2016 021 01:27:45
-            "stop time":2016 021 01:28:45
-            "type": TRACK
-        }
-
-+ Response 201 (application/json)
-
-        [
-            [Task][]
-        ]
-
-### Delete [DELETE]
-
-+ Response 204
-
-
-## Tasks Collection [/tasks]
-
-A colleciton of all tasks
-
-+ Model (application/json)
-
-    +   Body
-    
-            {
-                "id": {task_id}
-                "start time": 2016 021 01:27:45
-                "stop time":2016 021 01:28:45
-                "type": TRACK
-            }
-
-### List All Tasks [GET]
-
-+ Response 200 (application/json)
-
-        [
-            [Task][]
-        ]
-+ Response 200 (application/xml)
-
-        [
-            <Tasks>
-                <Task>
-                    <TaskId>{task_id}</TaskId>
-                    <URI>http://viaDDSdemp1/tasks/{task_id}</URI>
-                </Task>
-            </Tasks>
-        ]
-            
-### Create a New Task [POST]
-
-You may create a new task using this action. It takes a JSON
-object containing a information about the task. 
-
-+ Request (application/json)
-
-        {
-            "start time": 2016 021 01:27:45
-            "stop time":2016 021 01:28:45
-            "type": TRACK
-        }
-
-+ Response 201 (application/json)
-
-        [
-            [Task][]
-        ]
-
-### Delete [DELETE]
-Adding this description for deleling a Reservation - dparks
-
-+ Response 204
-
-
 ## Reservation Collection [/reservations_{user_id}]
 
 A colleciton of all reservations for a particular user
@@ -121,7 +26,7 @@ A colleciton of all reservations for a particular user
 
 ## Reservation [/reservation/{user_id}]
 
-A reservation requiest
+A reservation request
 
 Required Attribute:
     - user_id
@@ -130,3 +35,4 @@ Required Attribute:
     
 Option attributes:
     - 'stationId'
+    - 'satellite'
