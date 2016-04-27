@@ -6,12 +6,12 @@ HOST: http://polls.apiblueprint.org/
 viaDDSdemo1 is an ViaSat Data Delivery service API allowing consumers to request data collection from various antenna sites around the world.
 
 
-## Reservation Collection [/reservations_{user_id}]
+## Reservation Collection [/reservations/{user_id}]
 
 A colleciton of all reservations for a particular user
 
 + Parameters
-    + user_id (number) - ID of the dds user in the form of an integer
+    + user_id (string) - ID of the dds user in the form of an string
 
 + Model (application/json)
 
@@ -31,8 +31,9 @@ Return a collection of all the reservations for this user.
 
         {
             "id": {user_id},
-            "url": "/reservations_{user_id}/1",
-            "reservations": [
+            "url": "/reservations/{user_id}/{task_id}",
+            "reservations": 
+            [
                 {
                     "id": {task_id},
                     "site":"mySite",
@@ -55,10 +56,13 @@ Response then return specific header and body.
 + Request (application/json)
 
         {
-            "reservation": [
-                "site":"mySite",
-                "start time": 2016 021 01:27:45,
-                "stop time":2016 021 01:28:45
+            "reservation": 
+            [
+                {
+                    "site":"mySite",
+                    "start time": 2016 021 01:27:45,
+                    "stop time":2016 021 01:28:45
+                }
             ]
         }
 
@@ -72,10 +76,13 @@ Response then return specific header and body.
 
             {
                 "url": "/reservation/{task_id}",
-                "reservation": [
-                    "site":"mySite",
-                    "start time": 2016 021 01:27:45,
-                    "stop time":2016 021 01:28:45
+                "reservation": 
+                [
+                    {
+                        "site":"mySite",
+                        "start time": 2016 021 01:27:45,
+                        "stop time":2016 021 01:28:45
+                    }
                 ]
                    
             }
@@ -86,11 +93,13 @@ A reservation request
 
 Required Attribute:
     - user_id
+    - 'stationId'
     - 'StartTime'
     - 'StopTime'
+
     
 Option attributes:
-    - 'stationId'
+
     - 'satellite'
     
 + Parameters
@@ -105,7 +114,8 @@ Return a reservation detail.
         {
             "id": {user_id},
             "url": "/reservation/{task_id}",
-            "reservation": [
+            "reservation": 
+            [
                 {
                     "id": {task_id},
                     "site":"mySite",
