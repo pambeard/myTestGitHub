@@ -18,14 +18,70 @@ A colleciton of all reservations for a particular user
     +   Body
     
             {
-                "id": {user_id}
-                "start time": 2016 021 01:27:45
+                "id": {task_id},
+                "site":"mySite",
+                "start time": 2016 021 01:27:45,
                 "stop time":2016 021 01:28:45
+            }
+### Get all Reservations [GET]
+
+Return a collection of all the reservations for this user.
+
++ Response 200 (application/json)
+
+        {
+            "id": {user_id},
+            "url": "/reservations_{user_id}/1",
+            "reservations": [
+                {
+                    "id": {task_id},
+                    "site":"mySite",
+                    "start time": 2016 021 01:27:45,
+                    "stop time":2016 021 01:28:45,
+                },
+                {
+                    "id": {task_id},
+                    "site":"mySite",
+                    "start time": 2016 021 01:27:45,
+                    "stop time":2016 021 01:28:45
+                }
+            ]
+        }
+### Create a New Reservation [POST]
+Requests a new reservation with this action.
+This action takes a JSON payload as part of the request.
+Response then return specific header and body.
+
++ Request (application/json)
+
+        {
+            "reservation": [
+                "site":"mySite",
+                "start time": 2016 021 01:27:45,
+                "stop time":2016 021 01:28:45
+            ]
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /reservation/{task_id}
+
+    + Body
+
+            {
+                "url": "/reservation/{task_id}",
+                "reservation": [
+                    "site":"mySite",
+                    "start time": 2016 021 01:27:45,
+                    "stop time":2016 021 01:28:45
+                ]
+                   
             }
 
 
-## Reservation [/reservation/{user_id}]
-
+## Reservation [/reservation/{task_id}]
 A reservation request
 
 Required Attribute:
@@ -36,3 +92,30 @@ Required Attribute:
 Option attributes:
     - 'stationId'
     - 'satellite'
+    
++ Parameters
+    + task_id (number) - ID of the reservation in the form of an integer
+
+
+### View a Reservation Detail [GET]
+Return a reservation detail.
+
++ Response 200 (application/json)
+
+        {
+            "id": {user_id},
+            "url": "/reservation/{task_id}",
+            "reservation": [
+                {
+                    "id": {task_id},
+                    "site":"mySite",
+                    "start time": 2016 021 01:27:45,
+                    "stop time":2016 021 01:28:45,
+                },
+            ]
+        }
+        
+### Delete [DELETE]
+Deletes a specific reservation.
+
++ Response 204
