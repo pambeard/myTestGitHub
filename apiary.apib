@@ -1,134 +1,723 @@
-FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
 
-# viaDDSdemo1
+# This is your document metadata
+info:
+  version: "0.0.3"
+  title: vMASS REST API (Multi Antenna Scheduling System)
+  contact:
+    name: ViaAssist
+    email: ViaAssist@viasat.com
 
-viaDDSdemo1 is an ViaSat Data Delivery service API allowing consumers to request data collection from various antenna sites around the world.
-
-
-## Reservation Collection [/reservations/{user_id}]
-
-A colleciton of all reservations for a particular user
-
-+ Parameters
-    + user_id (string) - ID of the dds user in the form of an string
-
-+ Model (application/json)
-
-    +   Body
-    
-            {
-                "id": {task_id},
-                "site":"mySite",
-                "start time": 2016 021 01:27:45,
-                "stop time":2016 021 01:28:45
-            }
-### Get all Reservations [GET]
-
-Return a collection of all the reservations for this user.
-
-+ Response 200 (application/json)
-
-        {
-            "id": {user_id},
-            "published_at": "2016-11-11T08:40:51.620Z",
-            "url": "/reservations/{user_id}/{task_id}",
-            "reservations": 
-            [
-                {
-                    "id": {task_id},
-                    "site":"mySite",
-                    "start time": 2016 021 01:27:45,
-                    "stop time":2016 021 01:28:45,
-                },
-                {
-                    "id": {task_id},
-                    "site":"mySite",
-                    "start time": 2016 021 01:27:45,
-                    "stop time":2016 021 01:28:45
-                }
-            ]
-        }
-### Create a New Reservation [POST]
-Requests a new reservation with this action.
-This action takes a JSON payload as part of the request.
-Response then return specific header and body.
-
-+ Request (application/json)
-
-        {
-            "reservation": 
-            [
-                {
-                    "site":"mySite",
-                    "start time": 2016 021 01:27:45,
-                    "stop time":2016 021 01:28:45
-                }
-            ]
-        }
-
-+ Response 201 (application/json)
-
-    + Headers
-
-            Location: /reservation/{task_id}
-
-    + Body
-
-            {
-                "published_at": "2016-11-11T08:40:51.620Z",
-                "url": "/reservation/{task_id}",
-                "reservation": 
-                [
-                    {
-                        "site":"mySite",
-                        "start time": 2016 021 01:27:45,
-                        "stop time":2016 021 01:28:45
-                    }
-                ]
-                   
-            }
-
-
-## Reservation [/reservation/{task_id}]
-A reservation request
-
-Required Attribute:
-    - user_id
-    - 'stationId'
-    - 'StartTime'
-    - 'StopTime'
-
-    
-Option attributes:
-
-    - 'satellite'
-    
-+ Parameters
-    + task_id (number) - ID of the reservation in the form of an integer
-
-
-### View a Reservation Detail [GET]
-Return a reservation detail.
-
-+ Response 200 (application/json)
-
-        {
-            "id": {user_id},
-            "published_at": "2016-11-11T08:40:51.620Z",
-            "url": "/reservation/{task_id}",
-            "reservation": 
-            [
-                {
-                    "id": {task_id},
-                    "site":"mySite",
-                    "start time": 2016 021 01:27:45,
-                    "stop time":2016 021 01:28:45,
-                },
-            ]
-        }
+# Describe your paths here
+paths:
+# This is a path endpoint. Change it.
+  /reservations:
+    # This is a HTTP operation
+    get:
+      tags:
+        - reservation
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Gets `Reservation` objects. This call is a ViaSat administrator only
+      operationId: getAllReservations
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Reservation"
+      security:
+        - api_key: []
+    options:
+      tags:
+        - reservation
+      description: Lists the allowed operations for `Reservation` resource.  
+      operationId: optionsReservations
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: []
+  /reservations/{userId}:
+    get:
+      tags:
+        - reservation    
+      description: Returns `Reservation` objects based on a `UserId`
+      operationId: findReservationUserById
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string
+      responses:
+        '200':
+          description: User reservations
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Reservation"
+        "405":
+          description: Validation exception
+        "404":
+          description: UserId not found
+        "400":
+          description: Invalid ID supplied
+      security:
+        - api_key: []
+    post:
+      tags:
+        - reservation
+      description: Creates `Reservation` objects.
+      operationId: postReservationByUserId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: ReservationReqeuest object that contains the required Reservation object and Optonal satellite object.
+          required: true
+          schema:
+            $ref: "#/definitions/Reservation"
+      responses:
+        '200':
+          description: User reservation status
+          schema:
+            $ref: "#/definitions/ReservationStatus"
+        "405":
+          description: Validation exception
+        "404":
+          description: UserId not found
+        "400":
+          description: Invalid ID supplied
+      security:
+        - api_key: []
+    options:
+      tags:
+        - reservation
+      description: Lists the allowed operations for `Reservation`/`userId` resource.  
+      operationId: optionsReservationsUserId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string  
+      responses:
+        200:
+          description: Allow GET, POST
+      security:
+        - api_key: []
+  /reservations/{userId}/{taskId}:
+    get:
+      tags:
+        - reservation    
+      description: Returns `Reservation` objects based on a `TaskId`
+      operationId: findReservationByTaskId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string  
+        - name: taskId
+          in: path
+          description: taskID of reservation to fetch
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Reservation response
+          schema:
+            $ref: '#/definitions/Reservation'
+        "405":
+          description: Validation exception
+        "404":
+          description: Reservation not found
+        "400":
+          description: Invalid ID supplied
+      security:
+        - api_key: []
+    put:
+      tags:
+        - reservation
+      description: Update an existing `Reservation`
+      operationId: updatedReservationTaskId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string  
+        - name: taskId
+          in: path
+          description: taskID of reservation to modify
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: Reservation to update
+          required: true
+          schema:
+            $ref: '#/definitions/Reservation'
+      responses:
+        '200':
+          description: Reservation Status
+          schema:
+            $ref: '#/definitions/ReservationStatus'
+        '405':
+          description: Validation exception
+        '404':
+          description: Reservation found
+        '400':
+          description: Invalid ID supplied
+      security:
+        - api_key: []
+    delete:
+      tags:
+          - reservation
+      description: Delete a `Reservation`
+      operationId: deleteReservationTaskId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string    
+        - name: taskId
+          in: path
+          description: taskID of reservation to modify
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Reservation deleted
+        '405':
+          description: Validation exception
+        '404':
+          description: Reservation not found
+        '400':
+          description: Invalid ID supplied 
+      security:
+        - api_key: []
+    options:
+      tags:
+        - reservation
+      description: Lists the allowed operations for `Reservation`/`taskId` resource.  
+      operationId: optionsReservationsTaskId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string    
+        - name: taskId
+          in: path
+          description: taskID of reservation to modify
+          required: true
+          type: string
+      responses:
+        200:
+          description: Allow GET, PUT, DELETE
+      security:
+        - api_key: []      
+  /stations:
+  # This is a HTTP operation
+    get:
+      tags:
+        - station
+        # Describe this verb here. Note: you can use markdown
+      description: |
+        Gets a list of `StationId`.  `StationId` can be used to get detail station information.
+      operationId: getStations
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/StationId"
+      security:
+        - api_key: []
+    options:
+      tags:
+        - station
+      description: Lists the allowed operations for `Stations` resource.  
+      operationId: optionsStations
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: []
+  /stations/{userId}:
+    get:
+      tags:
+        - station    
+      description: Returns a `Station` based on a `StationId`
+      operationId: findStationsByUserId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: List of Station Ids 
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/StationId"            
+      security:
+        - api_key: []
+    options:
+      tags:
+        - station
+      description: Lists the allowed `StationId`.  
+      operationId: optionsStationByUserId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string    
+      
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: [] 
+  /stations/{userId}/{stationId}:
+    get:
+      tags:
+        - station    
+      description: Returns a `Station` based on a `StationId`
+      operationId: findStationById
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string  
+        - name: stationId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Station response
+          schema:
+            $ref: '#/definitions/Station'
+      security:
+        - api_key: []
+    options:
+      tags:
+        - station
+      description: Lists the allowed operations for `Station`/`StationId` resource.  
+      operationId: optionsStationStationId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string    
+        - name: stationId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: []       
+ 
         
-### Delete [DELETE]
-Deletes a specific reservation.
-
-+ Response 204
+  /satellite/{userId}:
+    post:
+      tags:
+        - ephemeris
+      description: Creates `Satellite` objects in all `userId`'s Stations.  Updates object if it exists
+      operationId: postSatelliteByUserId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Satellite object that needs to be added to the schedule
+          required: true
+          schema:
+            $ref: "#/definitions/Satellite"
+      responses:
+        "405":
+          description: Invalid input
+      security:
+        - api_key: []
+    put:
+      tags:
+        - ephemeris
+      description: Updates `Satellite` objects in all `userId`'s Stations.  Creates object if it exists
+      operationId: putSatelliteByUserId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: put satellite data for this user
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: Satellite object that needs to be added to the schedule
+          required: true
+          schema:
+            $ref: "#/definitions/Satellite"
+      responses:
+        "405":
+          description: Invalid input
+      security:
+        - api_key: []        
+    options:
+      tags:
+        - ephemeris
+      description: Lists the allowed operations for `Satellite`/`userId` resource.  
+      operationId: optionsSatelliteUserId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: ID of user to fetch
+          required: true
+          type: string  
+      responses:
+        200:
+          description: Allow POST, PUT
+      security:
+        - api_key: []     
+  /configurations:
+  # This is a HTTP operation
+    get:
+      tags:
+        - configuration
+      description: |
+        Gets a list of `Configuration`.  ViaSat only command.
+      operationId: getConfigurations
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/StationId"
+      security:
+        - api_key: []
+    options:
+      tags:
+        - configuration
+      description: Lists the allowed operations for `Stations` resource.  
+      operationId: optionsConfigurations
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: []
+  /configurations/{userId}:
+    get:
+      tags:
+        - configuration    
+      description: Returns a `Configuration` based on a `UserId`
+      operationId: findConfigurationsByUserId
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: get Configurations data for this user
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: List of Configurations
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Configuration"            
+      security:
+        - api_key: []
+    options:
+      tags:
+        - configuration
+      description: Lists the allowed `Configuration` requests.  
+      operationId: optionsConfigurationsByUserId
+        # This is array of GET operation parameters:
+      parameters:
+        - in: header
+          name: api_key
+          description: ""
+          required: true
+          type: string
+        - name: userId
+          in: path
+          description: post satellite data for this user
+          required: true
+          type: string    
+      
+      responses:
+        200:
+          description: Allow GET
+      security:
+        - api_key: []         
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+definitions:
+  Reservation:
+      type: object
+      required:
+        - station
+        - startTime
+        - stopTime
+      properties:
+        userId:
+          $ref: "#/definitions/UserId"
+        taskId:
+          $ref: "#/definitions/TaskId"
+        station: 
+          $ref: "#/definitions/StationId"
+        startTime:
+          type: string
+          format: date-time
+          description: As defined by date-time - RFC3339
+        stopTime:
+          type: string
+          format: date-time
+          description: As defined by date-time - RFC3339
+        satelliteId:
+          $ref: "#/definitions/SatelliteId"
+        configurationId:
+          $ref: "#/definitions/ConfigurationId"  
+        reservationStatus:
+          $ref: "#/definitions/ReservationStatus"
+  Station:
+    type: object
+    required:
+      - stationId
+      - latitude
+      - longitude
+      - altitude
+    properties:
+      stationId:
+        $ref: "#/definitions/StationId"
+      stationName:
+        description: Long name or description for the station.
+        type: string
+      latitude:
+        description: Latitude in degrees
+        type: number
+        format: double
+        minimum: -90
+        maximum: +90
+      longitude:
+        description: Longitude in degrees
+        type: number
+        format: double
+        minimum: -180
+        maximum: +180
+      altitude:
+        description: Altitude in meters
+        type: number
+        format: double
+ 
+  Satellite:
+    type: object
+    required:
+      - satelliteId
+      - ephemerisType
+      - ephemerisData
+    properties:
+      satelliteId:
+        $ref: "#/definitions/SatelliteId"
+      ephemerisType:
+        description: The format of the ephemeris data
+        type: string
+        default: TLE
+        enum:
+          - TLE
+      ephemerisData:
+        type: string
+  ReservationStatus:
+    type: object
+    properties:
+      status:
+        type: string
+        enum:
+          - Accepted
+          - Pending
+          - Rejected
+      statusDetail:
+        type: string
+        enum:
+          - Ok
+          - Reservation pending, the reservation has lower priority than current reservation
+          - Reservation accepted, but Satellite pass conflicts with current scheudle
+          - Reservation accepted, but failed to locate ephemeris for satellite
+          - Reservation accepted, but requested Satellite is not visible during reservation time
+          - Reservation accepted, but failed to locate site info for antenna
+          - Reservation accepted, but failed to locate configuration id
+          - Reservation pending, reservation was bumped due to higher priority request
+          - Unknown Error
+  Configuration:
+    type: object
+    required:
+      - configurationId
+      - configdescription
+    properties:
+      configurationId:
+        $ref: "#/definitions/ConfigurationId"
+      configdescription:
+        type: string
+  UserId:
+    type: string
+  TaskId:
+      description: When not supplied, Task Id is auto generated.  This must be a unique id.
+      type: string
+  StationId:
+      description: Short Id for each station.
+      type: string
+  SatelliteId:
+      description: twenty-four character name (to be consistent with the name length in the NORAD SATCAT)
+      type: string  
+  ConfigurationId:
+      description: The station confgiuration id for the station equipent 
+      type: integer
+      format: int64
